@@ -1,0 +1,16 @@
+﻿indicator,exact_weight,paper_weight,diff
+Total agricultural machinery power (10^4 kW) (China Rural Statistical Yearbook),0.0462765864576012,0.046,0.00028
+Total agricultural output value (10^8 yuan) (China Rural Statistical Yearbook),0.0396481956477335,0.04,-0.00035
+Agricultural mechanization service organizations at year-end (units) (China Agricultural Machinery Industry Yearbook),0.0765150220751415,0.077,-0.00048
+Agricultural machinery households at year-end (units) (China Agricultural Machinery Industry Yearbook),0.0457842419944871,0.046,-0.00022
+Cultivated land area per agricultural laborer (10^3 ha/10^4 persons),0.0744281149315948,0.074,0.00043
+Machine-ploughing rate (%),0.0388496828746773,0.039,-0.00015
+Machine-sowing rate (%),0.0933816881422466,0.093,0.00038
+Machine-harvesting rate (%),0.0649118706643148,0.065,-9e-05
+Mechanized irrigation rate (%),0.0612182391405657,0.061,0.00022
+Mechanized plant-protection rate (%),0.066094265193954,0.066,9e-05
+Agricultural machinery power per sown area (10^4 kW/10^3 ha),0.0948245347065948,0.095,-0.00018
+Agricultural output value per agricultural laborer (10^8 yuan/10^4 persons),0.0799957028131041,0.08,-0.0
+Agricultural output value per unit cultivated area (10^8 yuan/10^3 ha),0.078978312252211,0.079,-2e-05
+Operation income of agricultural machinery per 10^4 kW (10^8 yuan/10^4 kW),0.0545361086746717,0.055,-0.00046
+Agricultural carbon emissions,0.0845574344311013,0.085,-0.00044

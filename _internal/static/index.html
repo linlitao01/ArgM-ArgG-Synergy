@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArgM&amp;ArgG Evaluation System — Agricultural Mechanization–Greening Coupling Coordination Assessment and Forecasting Platform</title>
+<link rel="stylesheet" href="/static/style.css?v=20260830k">
+<script src="/static/vendor/echarts.min.js?v=20260830k"></script>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <span class="logo">M⇄G</span>
+    <div>
+      <h1>Agricultural Mechanization–Greening Coupling Coordination Evaluation System</h1>
+      <p class="sub">Assessment and forecasting platform for the 11 provinces of the Yangtze River Economic Belt · Companion software of the ArgM&amp;ArgG paper (M1–M6 modular architecture)</p>
+    </div>
+  </div>
+  <div class="status-chip" id="statusChip">No data loaded</div>
+</header>
+
+<nav id="tabs">
+  <button class="tab active" data-tab="data">1. Data Management <small>M1</small></button>
+  <button class="tab" data-tab="weights">2. Indicators &amp; Weights <small>M2–M3</small></button>
+  <button class="tab" data-tab="indices">3. Index Computation <small>M4</small></button>
+  <button class="tab" data-tab="forecast">4. Forecasting <small>M5</small></button>
+  <button class="tab" data-tab="warning">5. Early-Warning Dashboard <small>M6</small></button>
+  <button class="tab" data-tab="about">6. Methodology Notes</button>
+</nav>
+
+<main>
+  <!-- ================= 1. Data management ================= -->
+  <section id="tab-data" class="panel active">
+    <div class="card">
+      <h2>Data Input (M1 Data Management)</h2>
+      <p class="hint">Two data levels are supported: the <b>index level</b> (province, year, mech, green; dcoord optional — when present the paper-convention coordination degree is used directly, otherwise it is computed automatically) and the
+        <b>indicator level</b> (province, year, indicator columns; full pipeline: standardization → entropy weights → indices → coupling coordination → forecasting).
+        The province column accepts Chinese names (Shanghai/Jiangsu…), and Excel workbooks with one sheet per year (sheet names 2022…) are stacked automatically.</p>
+      <div class="row">
+        <button class="btn primary" id="btnDemo">📥 Load Demo Data (index level: forecasting with paper conventions)</button>
+        <button class="btn" id="btnDemoInd">📊 Load Indicator-Level Demo (full pipeline: standardization→entropy weights→indices)</button>
+        <label class="btn">⬆ Upload Excel/CSV
+          <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" hidden>
+        </label>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn" id="btnReset">🗑 Reset Session</button>
+      </div>
+      <details>
+        <summary>Or paste data manually (Tab/comma/semicolon separated, first row is the header)</summary>
+        <textarea id="manualText" rows="6" placeholder="province	year	mech	green	dcoord
+Shanghai	2013	0.555	0.327	0.646
+..."></textarea>
+        <button class="btn primary" id="btnManual">Import Pasted Data</button>
+        <div class="hint">Tip: copy an Excel range and paste it (Tab separated); indicator-level data is supported too.</div>
+      </details>
+      <div id="dataMsg" class="msg"></div>
+    </div>
+    <div class="card">
+      <h2>Data Preview</h2>
+      <div class="table-wrap" id="dataPreview"><p class="hint">The preview appears after data is loaded.</p></div>
+    </div>
+  </section>
+
+  <!-- ================= 2. Indicators & weights ================= -->
+  <section id="tab-weights" class="panel">
+    <div class="card">
+      <h2>Indicator System (M2–M3)</h2>
+      <p class="hint">The 30 paper indicators are preset (15 mechanization + 15 greening). After uploading indicator-level data you can adjust each indicator's direction below,
+        then compute the entropy weights. Weights are normalized <b>within each subsystem</b> (paper convention).</p>
+      <div class="row">
+        <label>Data already standardized (skip min–max, use raw values)<input type="checkbox" id="skipStd"></label>
+        <label>Constant safeguard <input type="number" id="addConstant" value="0.01" step="0.01" min="0" style="width:70px"></label>
+        <button class="btn primary" id="btnWeights">🧮 Compute Entropy Weights (M3)</button>
+      </div>
+      <div id="directionsHost"></div>
+      <div id="weightsMsg" class="msg"></div>
+    </div>
+    <div id="weightsResult"></div>
+  </section>
+
+  <!-- ================= 3. Index computation ================= -->
+  <section id="tab-indices" class="panel">
+    <div class="card">
+      <h2>Composite Indices and Coupling Coordination (M4)</h2>
+      <p class="hint">Indicator level: U = Σ w·x′ (entropy aggregation), paper-convention index = U − 0.01 (constant-safeguard shift).
+        Index level: mech/green are used directly. Coupling coordination: C = 2√(U₁U₂)/(U₁+U₂), T = αU₁+βU₂, D = √(CT).</p>
+      <div class="row">
+        <label>α (mechanization weight) <input type="number" id="alpha" value="0.5" step="0.05" min="0" max="1" style="width:70px"></label>
+        <label>β (greening weight) <input type="number" id="beta" value="0.5" step="0.05" min="0" max="1" style="width:70px"></label>
+        <button class="btn primary" id="btnIndices">🧮 Compute Indices &amp; Coupling Coordination (M4)</button>
+      </div>
+      <div id="indicesMsg" class="msg"></div>
+    </div>
+    <div id="indicesResult"></div>
+  </section>
+
+  <!-- ================= 4. Forecasting ================= -->
+  <section id="tab-forecast" class="panel">
+    <div class="card">
+      <h2>Forecasting and Reliability (M5 · Algorithm 1)</h2>
+      <p class="hint">Core: GM(1,1) (paper conventions, with posterior-error-ratio C / small-error-probability P grading, 1000-resample residual bootstrap 90% intervals,
+        and ARIMA(1,1,0)/Holt cross-model checks). <b>Nonlinear enhancements</b>: Verhulst grey model (dx/dt+ax=bx²),
+        NARX-BP neural network (sliding-window recursive forecasting), and quadratic polynomial trend, compared series by series with direction-disagreement flags.</p>
+      <div class="row">
+        <label>Bootstrap resamples B <input type="number" id="B" value="1000" step="100" min="100" style="width:90px"></label>
+        <label>Random seed <input type="number" id="seed" value="20260829" style="width:110px"></label>
+        <button class="btn primary" id="btnForecastAll">⚡ Forecast All Series in Batch (M/G/D)</button>
+        <button class="btn" id="btnForecastOne">🔍 Forecast Selected Single Series (incl. nonlinear models)</button>
+        <select id="seriesSelect" style="min-width:220px"></select>
+      </div>
+      <div id="batchProgress"></div>
+      <div id="forecastMsg" class="msg"></div>
+    </div>
+    <div id="forecastBatchResult"></div>
+    <div id="forecastOneResult"></div>
+  </section>
+
+  <!-- ================= 5. Early-warning dashboard ================= -->
+  <section id="tab-warning" class="panel">
+    <div class="card">
+      <h2>Early-Warning Dashboard (M6)</h2>
+      <p class="hint"><b>Warning rules (the two paper §2.5 examples)</b><br>
+        1. "greening decline with a reliable grade" — a province's <b>greening</b> index declines toward 2030 under a reliable forecast (Grade I/II) → "greening setback" risk;<br>
+        2. "mechanization rising while greening stagnant" — <b>mechanization</b> reliably rises while <b>greening</b> stays basically flat (2030 change &lt; 0.02) → "structural imbalance" risk (fast mechanization, slow greening).<br>
+        Additionally: Grade III/IV unreliable flags and cross-model direction-divergence flags. Above, the per-province coordination degree D trend chart (observed + forecast extension); below, the risk matrix = province × variable.</p>
+      <button class="btn primary" id="btnWarning">🚨 Generate Early-Warning Dashboard</button>
+      <div id="warningMsg" class="msg"></div>
+    </div>
+    <div id="warningResult"></div>
+  </section>
+
+  <!-- ================= 6. Methodology notes ================= -->
+  <section id="tab-about" class="panel">
+    <div class="card">
+      <h2>Computation Conventions (consistent with the paper / Appendix A.9, regression-tested)</h2>
+      <div id="aboutContent"></div>
+    </div>
+  </section>
+</main>
+
+<footer>ArgM&amp;ArgG Evaluation System v1.1 · Companion software of the paper · Core algorithms regression-verified against the paper benchmarks (Stata rerun / Appendix A.9), 67/67 passed</footer>
+<script src="/static/app.js?v=20260830k"></script>
+</body>
+</html>
