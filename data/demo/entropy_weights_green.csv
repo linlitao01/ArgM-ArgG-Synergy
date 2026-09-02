@@ -1,0 +1,16 @@
+﻿indicator,exact_weight,paper_weight,diff
+Cropland multiple-cropping index,0.0521507762733116,0.052,0.00015
+Water consumption per unit agricultural output value,0.045515740974181,0.046,-0.00048
+Electricity consumption per unit agricultural output value,0.0284344912725676,0.028,0.00043
+Agricultural machinery power per sown area,0.0436726430054621,0.044,-0.00033
+Irrigation-area share,0.0878290156409704,0.088,-0.00017
+Chemical fertilizer application intensity,0.0607904428382979,0.061,-0.00021
+Plastic film application intensity,0.0304983707057077,0.03,0.0005
+Diesel application intensity,0.0335816754943984,0.034,-0.00042
+Pesticide application intensity,0.0794804389852944,0.079,0.00048
+Forest coverage rate,0.0619097525472991,0.062,-9e-05
+Flood-prevention area,0.1979293462519125,0.198,-7e-05
+Erosion-control area,0.0716401419364285,0.072,-0.00036
+Total output value of agriculture / forestry / animal husbandry / fishery,0.0507428751256502,0.051,-0.00026
+Grain yield per unit area,0.0481896231460843,0.048,0.00019
+Rural per-capita disposable income,0.1076346658024336,0.108,-0.00037
